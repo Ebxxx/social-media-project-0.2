@@ -5,49 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SocialConnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/custom.css" >
 </head>
 
 <body class="bg-gray-100" ng-controller="PostController">
     <!-- Navigation Bar -->
-    <nav class="bg-blue-600 text-white p-3 fixed top-0 left-0 right-0 z-10">
+    <nav class="bg-orange-600 text-white p-3 fixed top-0 left-0 right-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <img src="/logo/fishbook.png" alt="Fishbook Logo" class="h-11 mr-2">
+                <img src="/logo/S.png" alt="Socialz Logo" class="h-11 mr-2">
                 <h1 class="text-2xl font-bold">Socialz</h1>
             </div>
-            <div class="flex space-x-4" ng-controller="MainController">
-                <a href="javascript:void(0)" class="hover:bg-blue-700 p-2 rounded flex items-center">
-                    <img src="logo/app-logo.png" alt="User Profile" class="h-8 w-8 rounded-full mr-2"> <!-- Adjust size as needed -->
-                    <span>{{ userName }}</span>
+            <div class="relative" ng-controller="MainController">
+                <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center" ng-click="dropdownVisible = !dropdownVisible">
+                    <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-8 w-8 rounded-full mr-2">
+                    <!-- <span class="font-bold text-lg text-black no-underline" >{{ userName }}</span> -->
                 </a>
-
-                <!-- Notification icon and dropdown -->
-                <!-- <div ng-controller="NotificationController">
-                    <div class="relative">
-                        <div class="notification-icon cursor-pointer" ng-click="toggleNotifications()">
-                            <i class="fa fa-bell"></i>
-                            <span class="badge absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs" ng-if="notifications.length > 0">
-                                {{ notifications.length }}
-                            </span>
-                        </div>
-                        <div class="notification-dropdown absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10" ng-show="showNotifications">
-                            <div class="py-1">
-                                <div ng-repeat="notification in notifications" class="px-4 py-2 hover:bg-gray-100 cursor-pointer" ng-click="markAsRead(notification)">
-                                    {{ notification.type }} - {{ notification.created_at | date:'medium' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <a href="javascript:void(0)" ng-click="logout()" class="hover:bg-blue-700 p-3 rounded">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>                            
+            
+                <!-- Dropdown Menu -->
+                <div ng-show="dropdownVisible" class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <a href="#!/profile" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-100 no-underline">
+                        Profile
+                    </a>
+                    <a href="javascript:void(0)" ng-click="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 no-underline">
+                        Logout
+                    </a>
+                </div>
             </div>
-        </div>
     </nav>
 
+    <br>
+    
     <!-- Main Content -->
     <div class="container mx-auto mt-20 flex justify-center">
         <!-- Main Feed -->
@@ -57,18 +47,10 @@
                 {{ errorMessage }}
             </div>
 
-            <!-- Post Creation Section -->
-            <div class="bg-white rounded-lg border-2 border-gray-300 shadow-lg mb-6">
-                <div class="p-4">
-                    <h2 class="text-xl font-bold mb-4 text-gray-800">Create Post</h2>
-                    <form ng-submit="createPost()" class="space-y-4">
-                        <textarea ng-model="newPost.content" required class="w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="What's on your mind?"></textarea>
-                        <button type="submit" class="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center">
-                            <i class="fas fa-paper-plane mr-2"></i> Post
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <!-- Post Creation Button -->
+            <button ng-click="openModal()" class="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 flex items-center justify-center mb-6">
+                <i class="fas fa-plus mr-2"></i> Create Post
+            </button>
 
             <!-- Displayed Posts Section -->
             <div class="space-y-6">
@@ -81,45 +63,52 @@
                                     <p class="text-gray-500 text-sm">{{ post.created_at | date:'medium' }}</p>
                                 </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button ng-if="post.can_edit" ng-click="editPost(post)" class="text-gray-400 hover:text-blue-600">
-                                    <i class="fas fa-edit"></i>
+
+                            <!-- Three dots menu button -->
+                            <div class="relative">
+                                <button ng-if="post.can_edit" ng-click="post.showMenu = !post.showMenu" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-ellipsis-h"></i>
                                 </button>
-                                <button ng-click="deletePost(post)" class="text-gray-400 hover:text-red-600">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <!-- Dropdown menu for Edit/Delete -->
+                                <div ng-show="post.showMenu" class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                                    <button ng-click="editPost(post); post.showMenu = false" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-100">
+                                        Edit
+                                    </button>
+                                    <button ng-click="deletePost(post); post.showMenu = false" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100">
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
                         <p class="mt-2 text-gray-700" ng-hide="post.editing">{{ post.content }}</p>
 
-                        <!-- Edit Section -->
+                        <!-- Edit post content -->
                         <div ng-show="post.editing" class="mt-4">
                             <form ng-submit="updatePost(post); post.editing = false">
-                                <textarea ng-model="post.content" required class="mt-1 block w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <textarea ng-model="post.content" required class="mt-1 block w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
                                 <div class="flex justify-between mt-2">
-                                    <button type="submit" class="text-blue-600 hover:text-blue-800">
-                                        <i class="fas fa-save"></i> Save
+                                    <button type="submit" class="text-sm text-orange-600 hover:text-orange-800">
+                                       Save
                                     </button>
-                                    <button ng-click="post.editing = false" type="button" class="text-gray-600 hover:text-gray-800">
-                                        <i class="fas fa-times"></i> Cancel
+                                    <button ng-click="post.editing = false" type="button" class="text-sm text-gray-600 hover:text-gray-800">
+                                         Cancel
                                     </button>
                                 </div>
                             </form>
                         </div>
 
                         <div class="mt-4 flex items-center justify-between border-t border-b border-gray-200 py-2">
-                            <button ng-click="toggleLike(post)" class="flex items-center text-gray-500 hover:text-blue-600">
+                            <button ng-click="toggleLike(post)" class="flex items-center text-gray-500 hover:text-orange-600">
                                 <i class="fas" ng-class="{'fa-thumbs-down': post.is_liked, 'fa-thumbs-up': !post.is_liked}"></i>
                                 <span class="ml-1">{{ post.is_liked ? 'Unlike' : 'Like' }} ({{ post.likes_count }})</span>
                             </button>
-                            <button class="flex items-center text-gray-500 hover:text-blue-600">
+                            <button class="flex items-center text-gray-500 hover:text-orange-600">
                                 <i class="fas fa-comment mr-1"></i> Comment
                             </button>
-                            <!-- <button class="flex items-center text-gray-500 hover:text-blue-600">
-                                <i class="fas fa-share mr-1"></i> Share
-                            </button> -->
                         </div>
 
+                        <!-- Comments Section -->
                         <div class="mt-4 space-y-2">
                             <div class="flex items-start" ng-repeat="comment in post.comments">
                                 <div class="bg-gray-100 rounded-lg p-2 flex-grow">
@@ -136,9 +125,10 @@
                             </div>
                         </div>
 
+                        <!-- Add Comment -->
                         <form ng-submit="addComment(post)" class="mt-4 flex items-center">
-                            <input ng-model="post.newComment" required class="flex-grow px-3 py-2 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write a comment...">
-                            <button type="submit" class="ml-2 text-blue-600 hover:text-blue-800">
+                            <input ng-model="post.newComment" required class="flex-grow px-3 py-2 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Write a comment...">
+                            <button type="submit" class="ml-2 text-orange-600 hover:text-orange-800">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
@@ -147,5 +137,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Post Modal -->
+    <div ng-show="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
+            <h2 class="text-xl font-bold mb-4">Create Post</h2>
+            <form ng-submit="createPost()">
+                <textarea ng-model="newPost.content" required class="w-full px-3 py-2 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="What's on your mind?"></textarea>
+                <div class="flex justify-end mt-4">
+                    <button type="button" ng-click="closeModal()" class="mr-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button type="submit" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                        <i class="fas fa-paper-plane mr-2"></i> Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="js/PostController.js"></script>
 </body>
 </html>

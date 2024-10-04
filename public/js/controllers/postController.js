@@ -2,7 +2,9 @@ angular.module('socialMediaApp')
     .controller('PostController', function($scope, PostService, CommentService, LikeService) {
         $scope.posts = [];
         $scope.newPost = {};
+        $scope.isModalOpen = false; // Modal open state
 
+        // Load posts on init
         $scope.loadPosts = function() {
             PostService.getPosts()
                 .then(function(response) {
@@ -19,6 +21,18 @@ angular.module('socialMediaApp')
                     $scope.errorMessage = 'Failed to load posts. Please try again.';
                 });
         };
+        
+
+        // Open modal
+        $scope.openModal = function() {
+            $scope.isModalOpen = true;
+        };
+
+        // Close modal
+        $scope.closeModal = function() {
+            $scope.isModalOpen = false;
+            $scope.newPost.content = ''; // Clear input
+        };
 
         // Create post
         $scope.createPost = function() {
@@ -33,13 +47,15 @@ angular.module('socialMediaApp')
                     newPost.is_liked = newPost.is_liked || false;
                     $scope.posts.unshift(newPost);
                     $scope.newPost = {}; // Reset input
+
+                    // Close the modal after successfully creating a post
+                    $scope.closeModal();
                 })
                 .catch(function(error) {
                     console.error('Error creating post:', error);
                     $scope.errorMessage = 'Failed to create post. Please try again.';
                 });
         };
-
         // Update post
         $scope.updatePost = function(post) {
             PostService.updatePost(post.id, post)
@@ -113,7 +129,6 @@ angular.module('socialMediaApp')
                     $scope.errorMessage = 'Failed to toggle like. Please try again.'; // Set error message
                 });
         };
-
         // Load posts on init
         $scope.loadPosts();
     });

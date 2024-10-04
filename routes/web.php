@@ -13,9 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::get('{any}', function () {
     return file_get_contents(public_path('index.html'));
 })->where('any', '.*');
 
 require __DIR__.'/auth.php';
 
+
+// Auth::routes();
+
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

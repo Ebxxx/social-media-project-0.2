@@ -1,0 +1,83 @@
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    text-align: center;
+}
+
+.profile-info {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.profile-picture-preview {
+    display: flex;
+    align-items: center;
+}
+
+.profile-picture-preview img {
+    width: 100px; /* Set a fixed width for the image */
+    height: auto;
+    border-radius: 50%; /* Make the image round */
+    margin-right: 10px; /* Space between image and label */
+}
+
+.profile-details {
+    margin: 10px 0;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-edit, .btn-update, .btn-cancel {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 48%; /* Set buttons to occupy half of the space */
+}
+
+.btn-cancel {
+    background-color: #dc3545; /* Different color for cancel button */
+}
+
+.btn-edit:hover, .btn-update:hover, .btn-cancel:hover {
+    opacity: 0.9; /* Slightly change opacity on hover */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+input[type="file"] {
+    margin-top: 10px;
+}

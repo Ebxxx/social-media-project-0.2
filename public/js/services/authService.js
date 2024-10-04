@@ -21,6 +21,7 @@ angular.module('socialMediaApp')
             return Promise.resolve(); // Return a resolved promise for consistency
         };
     })
+    
     .factory('AuthInterceptor', function(AuthService, $q, $window) {
         return {
             request: function(config) {

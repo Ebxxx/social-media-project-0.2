@@ -16,6 +16,10 @@ angular.module('socialMediaApp', ['ngRoute'])
                 templateUrl: 'templates/posts.html',
                 controller: 'PostController'
             })
+            .when('/profile', { // Add the profile route here
+                templateUrl: 'templates/partial/profile.html',
+                controller: 'ProfileController'
+            })
             .otherwise({
                 redirectTo: '/login'
             });
