@@ -3,6 +3,7 @@ angular.module('socialMediaApp')
         $scope.posts = [];
         $scope.newPost = {};
         $scope.isModalOpen = false; // Modal open state
+        
 
         // Load posts on init
         $scope.loadPosts = function() {
@@ -13,6 +14,8 @@ angular.module('socialMediaApp')
                         post.is_liked = post.is_liked || false;
                         post.created_at = new Date(post.created_at);
                         post.editing = false; // Initialize editing state
+                        post.showComments = false;  // Initialize comment visibility state
+                        post.showCommentInput = false;
                         return post;
                     });
                 })
@@ -32,6 +35,10 @@ angular.module('socialMediaApp')
         $scope.closeModal = function() {
             $scope.isModalOpen = false;
             $scope.newPost.content = ''; // Clear input
+        };
+
+        $scope.toggleComments = function(post) {
+            post.showComments = !post.showComments;
         };
 
         // Create post
@@ -84,6 +91,14 @@ angular.module('socialMediaApp')
                 });
         };
 
+         // Toggle comment input visibility
+         $scope.toggleCommentInput = function(post) {
+            post.showCommentInput = !post.showCommentInput;
+            if (post.showCommentInput) {
+                post.showComments = true; // Show existing comments when comment input is shown
+            }
+        };
+
         // Add comment
         $scope.addComment = function(post) {
             if (!post.newComment) return; // Prevent adding empty comments
@@ -94,13 +109,14 @@ angular.module('socialMediaApp')
                     }
                     post.comments.push(response.data);
                     post.newComment = '';
+                    post.showComments = true; // Ensure comments are visible after adding
                 })
                 .catch(function(error) {
                     console.error('Error adding comment:', error);
                     $scope.errorMessage = 'Failed to add comment. Please try again.';
                 });
         };
-
+        
         // Delete comment
         $scope.deleteComment = function(post, comment) {
             console.log('Deleting comment with ID:', comment.id);

@@ -12,16 +12,16 @@
 
 <body class="bg-gray-100" ng-controller="PostController">
     <!-- Navigation Bar -->
-    <nav class="bg-orange-600 text-white p-3 fixed top-0 left-0 right-0 z-10">
+    <nav class="bg-orange-600 text-white p-1 fixed top-0 left-0 right-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <img src="/logo/S.png" alt="Socialz Logo" class="h-11 mr-2">
+                <img src="/logo/S.png" alt="Socialz Logo" class="h-12 mr-2">
                 <h1 class="text-2xl font-bold">Socialz</h1>
             </div>
             <div class="relative" ng-controller="MainController">
                 <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center" ng-click="dropdownVisible = !dropdownVisible">
-                    <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-8 w-8 rounded-full mr-2">
-                    <!-- <span class="font-bold text-lg text-black no-underline" >{{ userName }}</span> -->
+                    <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
+                    <span class="font-bold text-sm text-white no-underline" >{{ userName }}</span>
                 </a>
             
                 <!-- Dropdown Menu -->
@@ -53,16 +53,29 @@
             </button>
 
             <!-- Displayed Posts Section -->
-            <div class="space-y-6">
+            <!-- <div class="space-y-6">
                 <div ng-repeat="post in posts" class="bg-white rounded-lg border-2 border-gray-300 shadow-lg">
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-2">
                             <div class="flex items-center">
                                 <div>
+                                    <img ng-src="{{'/storage/profile_picture/' + post.user.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full ml-2">
                                     <p class="font-semibold text-gray-800">{{ post.user.name }}</p>
                                     <p class="text-gray-500 text-sm">{{ post.created_at | date:'medium' }}</p>
                                 </div>
-                            </div>
+                            </div> -->
+
+                            <div class="bg-white rounded-lg border-2 border-gray-300 shadow-lg" ng-repeat="post in posts">
+                                <div class="p-4">
+                                  <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center space-x-3">
+                                        <img ng-src="{{'/storage/profile_picture/' + post.user.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full ml-2">
+                                      <div class="flex flex-col">
+                                        <span class="font-semibold">{{ post.user.name }}</span>
+                                        <span class="text-sm text-gray-500">{{ post.created_at | date:'medium' }}</span>
+                                      </div>
+                                    </div>
+
 
                             <!-- Three dots menu button -->
                             <div class="relative">
@@ -80,9 +93,11 @@
                                 </div>
                             </div>
                         </div>
-
-                        <p class="mt-2 text-gray-700" ng-hide="post.editing">{{ post.content }}</p>
-
+                        
+                    <div>
+                        <p class="mt-2 text-gray-700" ng-hide="post.editing">{{ post.content }}</p> 
+                    </div>
+    
                         <!-- Edit post content -->
                         <div ng-show="post.editing" class="mt-4">
                             <form ng-submit="updatePost(post); post.editing = false">
@@ -97,20 +112,24 @@
                                 </div>
                             </form>
                         </div>
+                        
 
                         <div class="mt-4 flex items-center justify-between border-t border-b border-gray-200 py-2">
                             <button ng-click="toggleLike(post)" class="flex items-center text-gray-500 hover:text-orange-600">
-                                <i class="fas" ng-class="{'fa-thumbs-down': post.is_liked, 'fa-thumbs-up': !post.is_liked}"></i>
-                                <span class="ml-1">{{ post.is_liked ? 'Unlike' : 'Like' }} ({{ post.likes_count }})</span>
+                                <i class="fas" ng-class="{'fa-thumbs-up ': post.is_liked, 'fa-thumbs-up': !post.is_liked}"></i>
+                                <span class="ml-1">{{ post.is_liked ? '' : '' }} {{ post.likes_count }}</span>
                             </button>
-                            <button class="flex items-center text-gray-500 hover:text-orange-600">
+                            <button ng-click="toggleComments(post)" class="flex items-center text-gray-500 hover:text-orange-600">
                                 <i class="fas fa-comment mr-1"></i> Comment
+                                {{ post.showComments ? '' : '' }} {{ post.comments.length }} {{ post.comments.length > 1 ? '' : '' }}
                             </button>
-                        </div>
+                        </div>  
 
                         <!-- Comments Section -->
-                        <div class="mt-4 space-y-2">
+                        <div class="mt-4 space-y-2" ng-show="post.showComments">
+                        <!-- <div class="mt-4 space-y-2"> -->
                             <div class="flex items-start" ng-repeat="comment in post.comments">
+                                <img ng-src="{{'/storage/profile_picture/' + comment.user.profile_picture}}" alt="User Profile" class="h-8 w-8 rounded-full mr-3">
                                 <div class="bg-gray-100 rounded-lg p-2 flex-grow">
                                     <div class="flex justify-between items-start">
                                         <div>
@@ -124,6 +143,7 @@
                                 </div>
                             </div>
                         </div>
+                        
 
                         <!-- Add Comment -->
                         <form ng-submit="addComment(post)" class="mt-4 flex items-center">
