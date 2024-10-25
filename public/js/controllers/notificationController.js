@@ -1,40 +1,46 @@
 angular.module('socialMediaApp')
-    .controller('NotificationController', function($scope, NotificationService, $pusher) {
-        $scope.notifications = [];
+    .controller('NotificationController', function($scope, NotificationService) {
+        var $ctrl = this;
+        $ctrl.notifications = [];
+        $ctrl.unreadCount = 0;
+        $ctrl.showNotifications = false;
 
-        $scope.loadNotifications = function() {
-            NotificationService.getNotifications()
-                .then(function(response) {
-                    $scope.notifications = response.data;
-                });
+        $ctrl.fetchNotifications = function() {
+            NotificationService.fetchNotifications().then(function(response) {
+                $ctrl.notifications = response.data;
+                $ctrl.unreadCount = $ctrl.notifications.filter(n => !n.is_read).length;
+            }, function(error) {
+                console.error('Error fetching notifications', error);
+            });
         };
 
-        $scope.markAsRead = function(notification) {
-            NotificationService.markAsRead(notification.id)
-                .then(function() {
-                    notification.is_read = true;
-                });
+        $ctrl.markAsRead = function(notification) {
+            NotificationService.markAsRead(notification.id).then(function() {
+                notification.is_read = true;
+                $ctrl.unreadCount = Math.max(0, $ctrl.unreadCount - 1);
+            }, function(error) {
+                console.error('Error marking notification as read', error);
+            });
         };
 
-        $scope.deleteNotification = function(notification) {
-            NotificationService.deleteNotification(notification.id)
-                .then(function() {
-                    var index = $scope.notifications.indexOf(notification);
-                    $scope.notifications.splice(index, 1);
-                });
+        $ctrl.deleteNotification = function(notification) {
+            NotificationService.deleteNotification(notification.id).then(function() {
+                $ctrl.notifications = $ctrl.notifications.filter(n => n.id !== notification.id);
+                if (!notification.is_read) {
+                    $ctrl.unreadCount = Math.max(0, $ctrl.unreadCount - 1);
+                }
+            }, function(error) {
+                console.error('Error deleting notification', error);
+            });
         };
 
-        // Initialize Pusher
-        var pusher = $pusher(new Pusher('8a5955dbdf2f0cd9eeb5', {
-            cluster: 'ap1'
-        }));
+        $ctrl.toggleNotifications = function() {
+            $ctrl.showNotifications = !$ctrl.showNotifications;
+            if ($ctrl.showNotifications) {
+                $ctrl.fetchNotifications();
+            }
+        };
 
-        var channel = pusher.subscribe('private-user.' + userId);
-
-        channel.bind('new-notification', function(data) {
-            $scope.notifications.unshift(data.notification);
-            $scope.$apply();
-        });
-
-        $scope.loadNotifications();
+        // Initialize
+        $ctrl.fetchNotifications();
     });

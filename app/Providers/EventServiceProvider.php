@@ -6,6 +6,12 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Events\PostCreated;
+use App\Events\PostLiked;
+use App\Events\PostCommented;
+use App\Listeners\CreatePostNotification;
+use App\Listeners\CreateLikeNotification;
+use App\Listeners\CreateCommentNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,6 +24,7 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        
     ];
 
     /**

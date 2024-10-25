@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NewComment;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Notification;
+use App\Events\NewNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CommentController extends Controller
 {
@@ -20,25 +22,47 @@ class CommentController extends Controller
             'content' => $validated['content'],
         ]);
 
-        //event(new NewComment($post, $comment));
-    
+        // Create notification for the post owner
+        try {
+            if ($comment->user_id !== $post->user_id) {
+                $notification = Notification::create([
+                    'user_id' => $post->user_id,
+                    'post_id' => $post->id,
+                    'type' => 'comment'
+                ]);
+
+                Log::info('Notification created:', $notification->toArray());
+
+                broadcast(new NewNotification($notification))->toOthers();
+                Log::info('NewNotification event broadcasted');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating or broadcasting notification: ' . $e->getMessage());
+        }
+
         return $comment->load('user');
     }
 
     public function destroy(Comment $comment)
     {
-        \Log::info('Destroy method called for comment: ' . $comment->id);
+        Log::info('Destroy method called for comment: ' . $comment->id);
         
         try {
             $this->authorize('delete', $comment);
-            \Log::info('Authorization passed for deleting comment: ' . $comment->id);
+            Log::info('Authorization passed for deleting comment: ' . $comment->id);
             
             $comment->delete();
-            \Log::info('Comment deleted successfully: ' . $comment->id);
+            Log::info('Comment deleted successfully: ' . $comment->id);
+
+            // Delete associated notification if exists
+            Notification::where([
+                'post_id' => $comment->post_id,
+                'type' => 'comment'
+            ])->delete();
             
             return response()->json(['message' => 'Comment deleted successfully'], 200);
         } catch (\Exception $e) {
-            \Log::error('Error deleting comment: ' . $e->getMessage());
+            Log::error('Error deleting comment: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to delete comment'], 500);
         }
     }

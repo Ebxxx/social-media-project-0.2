@@ -20,6 +20,10 @@ angular.module('socialMediaApp', ['ngRoute'])
                 templateUrl: 'templates/partial/profile.html',
                 controller: 'ProfileController'
             })
+            .when('/notification', {
+                templateUrl: 'templates/posts.html',
+                controller: 'NotificationController'
+            })
             .otherwise({
                 redirectTo: '/login'
             });

@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Policies;
+
+
+use App\Models\User;
+use App\Models\Notification;
+
+class NotificationPolicy
+{
+    /**
+     * Determine if the authenticated user can delete the notification.
+     */
+    public function delete(User $user, Notification $notification)
+    {
+        return $user->id === $notification->user_id;
+    }
+
+    /**
+     * Determine if the authenticated user can mark the notification as read.
+     */
+    public function update(User $user, Notification $notification)
+    {
+        return $user->id === $notification->user_id;
+    }
+}

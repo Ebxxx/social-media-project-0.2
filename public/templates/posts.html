@@ -7,35 +7,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <link rel="stylesheet" href="css/custom.css" >
 </head>
 
 <body class="bg-gray-100" ng-controller="PostController">
-    <!-- Navigation Bar -->
     <nav class="bg-orange-600 text-white p-1 fixed top-0 left-0 right-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
+            <!-- Left Section: Logo and Title -->
             <div class="flex items-center">
                 <img src="/logo/S.png" alt="Socialz Logo" class="h-12 mr-2">
                 <h1 class="text-2xl font-bold">Socialz</h1>
             </div>
-            <div class="relative" ng-controller="MainController">
-                <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center" ng-click="dropdownVisible = !dropdownVisible">
-                    <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
-                    <span class="font-bold text-sm text-white no-underline" >{{ userName }}</span>
-                </a>
-            
-                <!-- Dropdown Menu -->
-                <div ng-show="dropdownVisible" class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
-                    <a href="#!/profile" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-100 no-underline">
-                        Profile
+    
+            <!-- Right Section: Notification and Profile Picture -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification Section (now before Profile) -->
+                <div class="relative" ng-controller="NotificationController as $ctrl">
+                    <button class="hover:bg-orange-700 p-2 rounded-full items-center border border-white h-10 w-10 no-underline" ng-click="showNotifications = !showNotifications">
+                        <i class="fas fa-bell text-white text-2xl"></i>
+                        <span class="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" ng-if="$ctrl.unreadCount">{{ $ctrl.unreadCount }}</span>
+                    </button>    
+                    
+                    <!-- Dropdown for notifications -->
+                    <div ng-show="showNotifications" class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-20">
+                        <div class="notification-dropdown">
+                            <div ng-repeat="notification in $ctrl.notifications" ng-class="{'unread': !notification.is_read}" class="p-2 border-b border-gray-200 text-orange-600">
+                                <p >You have a notification: {{ notification.type }} "{{ notification.post.content | limitTo: 30 }}..."</p>
+                                <div class="flex space-x-4"> <!-- Added horizontal spacing -->
+                                    <button ng-click="$ctrl.markAsRead(notification)" ng-if="!notification.is_read" class="text-gray-600 hover:text-gray-800">
+                                        Mark as Read
+                                    </button>    
+                                    <button ng-click="$ctrl.deleteNotification(notification)" class="text-red-600 hover:text-red-800">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div ng-if="$ctrl.notifications.length === 0" class="p-2 text-gray-500">No notifications</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Profile Section -->
+                <div class="relative" ng-controller="MainController">
+                    <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center no-underline" ng-click="dropdownVisible = !dropdownVisible">
+                        <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
+                        <span class="font-bold text-sm text-white no-underline">{{ userName }}</span>
                     </a>
-                    <a href="javascript:void(0)" ng-click="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 no-underline">
-                        Logout
-                    </a>
+                    <!-- Dropdown Menu -->
+                    <div ng-show="dropdownVisible" class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <a href="#!/profile" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-100 no-underline">
+                            Profile
+                        </a>
+                        <a href="javascript:void(0)" ng-click="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 no-underline">
+                            Logout
+                        </a>
+                    </div>
                 </div>
             </div>
+        </div>
     </nav>
-
     <br>
     
     <!-- Main Content -->
@@ -51,20 +82,6 @@
             <button ng-click="openModal()" class="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 flex items-center justify-center mb-6">
                 <i class="fas fa-plus mr-2"></i> Create Post
             </button>
-
-            <!-- Displayed Posts Section -->
-            <!-- <div class="space-y-6">
-                <div ng-repeat="post in posts" class="bg-white rounded-lg border-2 border-gray-300 shadow-lg">
-                    <div class="p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="flex items-center">
-                                <div>
-                                    <img ng-src="{{'/storage/profile_picture/' + post.user.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full ml-2">
-                                    <p class="font-semibold text-gray-800">{{ post.user.name }}</p>
-                                    <p class="text-gray-500 text-sm">{{ post.created_at | date:'medium' }}</p>
-                                </div>
-                            </div> -->
-
                             <div class="bg-white rounded-lg border-2 border-gray-300 shadow-lg" ng-repeat="post in posts">
                                 <div class="p-4">
                                   <div class="flex justify-between items-center mb-2">
@@ -173,7 +190,6 @@
             </form>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
