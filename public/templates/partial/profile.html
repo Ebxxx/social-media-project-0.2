@@ -21,7 +21,7 @@
             </div>
             <div class="relative" ng-controller="MainController">
                 <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center" ng-click="dropdownVisible = !dropdownVisible">
-                    <img ng-src="{{'/storage/profile_picture/' + profile.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
+                    <img ng-src="{{'/public/storage/profile_picture/' + profile.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
                 </a>
 
                 <!-- Dropdown Menu -->
@@ -50,7 +50,10 @@
             <div class="profile-info mb-5">
                 <div class="flex items-center mb-4">
                     <div class="mr-4">
-                        <img ng-src="{{'/storage/profile_picture/' + profile.profile_picture}}" alt="Profile Picture" class="profile-img rounded-full w-32 h-32 object-cover" />
+                        <img ng-src="{{profile.profile_picture_url}}" 
+                             alt="Profile Picture" 
+                             class="profile-img rounded-full w-32 h-32 object-cover"
+                             onerror="this.src='/storage/profile_picture/default.jpg'" />
                     </div>
                     <div>
                         <p><strong>Name:</strong> {{profile.name}}</p>

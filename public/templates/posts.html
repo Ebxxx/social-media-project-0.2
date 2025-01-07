@@ -51,8 +51,8 @@
                 <!-- Profile Section -->
                 <div class="relative" ng-controller="MainController">
                     <a href="javascript:void(0)" class="hover:bg-orange-700 p-2 rounded flex items-center no-underline" ng-click="dropdownVisible = !dropdownVisible">
-                        <img ng-src="{{'/storage/profile_picture/' + profilePicture}}" alt="User Profile" class="h-10 w-10 rounded-full mr-2">
-                        <span class="font-bold text-sm text-white no-underline">{{ userName }}</span>
+                        <img ng-src="{{ profile.profile_picture_url }}" alt="User Profile" class="h-10 w-10 rounded-full mr-2" onerror="this.src='/storage/profile_picture/default.jpg'">
+                        <span class="font-bold text-sm text-white no-underline">{{ profile.name }}</span>
                     </a>
                     <!-- Dropdown Menu -->
                     <div ng-show="dropdownVisible" class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
@@ -86,7 +86,7 @@
                                 <div class="p-4">
                                   <div class="flex justify-between items-center mb-2">
                                     <div class="flex items-center space-x-3">
-                                        <img ng-src="{{'/storage/profile_picture/' + post.user.profile_picture}}" alt="User Profile" class="h-10 w-10 rounded-full ml-2">
+                                        <img ng-src="{{ post.user.profile_picture_url }}" alt="User Profile" class="h-10 w-10 rounded-full ml-2" onerror="this.src='/storage/profile_picture/default.jpg'">
                                       <div class="flex flex-col">
                                         <span class="font-semibold">{{ post.user.name }}</span>
                                         <span class="text-sm text-gray-500">{{ post.created_at | date:'medium' }}</span>
@@ -146,7 +146,7 @@
                         <div class="mt-4 space-y-2" ng-show="post.showComments">
                         <!-- <div class="mt-4 space-y-2"> -->
                             <div class="flex items-start" ng-repeat="comment in post.comments">
-                                <img ng-src="{{'/storage/profile_picture/' + comment.user.profile_picture}}" alt="User Profile" class="h-8 w-8 rounded-full mr-3">
+                                <img ng-src="{{ comment.user.profile_picture_url }}" alt="User Profile" class="h-8 w-8 rounded-full mr-3" onerror="this.src='/storage/profile_picture/default.jpg'">
                                 <div class="bg-gray-100 rounded-lg p-2 flex-grow">
                                     <div class="flex justify-between items-start">
                                         <div>
